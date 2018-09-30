@@ -1,0 +1,63 @@
+---
+title: "p8105_hw2_sc4456"
+author: "Siyan Chen"
+date: "9/29/2018"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+```
+# Problem 1
+```{r}
+NYC_transit_data_modified = read_csv("./hw2_data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>% 
+  janitor::clean_names() %>% 
+  select(line, station_name, station_latitude, station_longitude, route1:route11, entry, vending, entrance_type, ada) %>% 
+  mutate(entry = recode(entry, `YES`= "TRUE", `NO` = "FALSE" )) 
+```
+The new dataset contains viables of line, station name, station latitude, station longitue, 1 to 11 routs served, entry, vending, entrance type and ADA notes. For the data cleaning steps, I import the original dataset and modify the variable names and then use select function to retain the variables I interested. The new dataset gives the `r nrow (NYC_transit_data_modified)` rows and `r ncol(NYC_transit_data_modified)`. This is not tidy data.
+```{r}
+distinct(NYC_transit_data_modified,station_name,line) %>% 
+  nrow()
+# Firstly, I use distinct function to find the distinct station which excludes the repeated stations. Then, I use nrow function to fund the number of distinct stations 
+NYC_transit_data_modified %>% 
+  filter(ada == "TRUE") %>% 
+  distinct(station_name,line) %>% 
+  nrow()
+# This is to get the anwser of how many stations are ADA complaint. Firstly, I removed the NA data of ADA notes.Then I use distinct function to found our how many distinct stations exist because some ADA compliants target the same station. It returns the 84 stations are ADA compliant. 
+```
+
+There are `r nrow(distinct (NYC_transit_data_modified, line, station_name))` distinct stations
+
+There are 84 stations are ADA compliant.
+
+```{r}
+NYC_transit_data_modified %>% 
+filter(vending == "YES") %>% 
+  nrow()/nrow(NYC_transit_data_modified)
+```
+???What proportion of station entrances / exits without vending allow entrance? It returns 90.2% station entrances/exits without vending allow entrance. 
+
+```{r}
+NYC_transit_data_modified %>% 
+  gather(., key = "route_number", value = "route_name", 5:15) %>% 
+  filter(., route_name == "A") %>% 
+  distinct(., station_name, line) %>% 
+  nrow() 
+# I use gather function to reformat date from wide to long. To get the number of distinct stations serving A train, I filter the data to only keep the rows with A trains. Then I use previous method to get the number of distinct stations, which returns 60. 
+```
+
+```{r}
+NYC_transit_data_modified %>% 
+  gather(., key = "route_number", value = "route_name", 5:15) %>% 
+  filter(., route_name == "A") %>% 
+  filter(ada == "TRUE") %>% 
+  distinct(., station_name, line) %>% 
+  nrow() 
+# Use filter function to firstly keep the row with A train and use filter function again to keep the row with ada complaints. It returns 17.
+```
+There are 56 distinct stations serve the A train.Of the stations that serve the A train, there are 17 have ADA complaint.
+
+
