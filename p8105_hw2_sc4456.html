@@ -149,7 +149,27 @@ $(document).ready(function () {
 ##   `Entrance Longitude` = col_double()
 ## )</code></pre>
 <pre><code>## See spec(...) for full column specifications.</code></pre>
-<p>The new dataset contains viables of line, station name, station latitude, station longitue, 1 to 11 routs served, entry, vending, entrance type and ADA notes. For the data cleaning steps, I import the original dataset and modify the variable names and then use select function to retain the variables I interested. The new dataset gives the 1868 rows and 19. This is not tidy data.</p>
+<pre class="r"><code>NYC_transit_data_modified</code></pre>
+<pre><code>## # A tibble: 1,868 x 19
+##    line  station_name station_latitude station_longitu… route1 route2
+##    &lt;chr&gt; &lt;chr&gt;                   &lt;dbl&gt;            &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; 
+##  1 4 Av… 25th St                  40.7            -74.0 R      &lt;NA&gt;  
+##  2 4 Av… 25th St                  40.7            -74.0 R      &lt;NA&gt;  
+##  3 4 Av… 36th St                  40.7            -74.0 N      R     
+##  4 4 Av… 36th St                  40.7            -74.0 N      R     
+##  5 4 Av… 36th St                  40.7            -74.0 N      R     
+##  6 4 Av… 45th St                  40.6            -74.0 R      &lt;NA&gt;  
+##  7 4 Av… 45th St                  40.6            -74.0 R      &lt;NA&gt;  
+##  8 4 Av… 45th St                  40.6            -74.0 R      &lt;NA&gt;  
+##  9 4 Av… 45th St                  40.6            -74.0 R      &lt;NA&gt;  
+## 10 4 Av… 53rd St                  40.6            -74.0 R      &lt;NA&gt;  
+## # ... with 1,858 more rows, and 13 more variables: route3 &lt;chr&gt;,
+## #   route4 &lt;chr&gt;, route5 &lt;chr&gt;, route6 &lt;chr&gt;, route7 &lt;chr&gt;, route8 &lt;int&gt;,
+## #   route9 &lt;int&gt;, route10 &lt;int&gt;, route11 &lt;int&gt;, entry &lt;chr&gt;,
+## #   vending &lt;chr&gt;, entrance_type &lt;chr&gt;, ada &lt;lgl&gt;</code></pre>
+<ul>
+<li>The new dataset contains viables of line, station name, station latitude, station longitue, 1 to 11 routs served, entry, vending, entrance type and ADA notes. For the data cleaning steps, I import the original dataset and modify the variable names and then use select function to retain the variables I interested. The new dataset gives the 1868 rows and 19. This is not tidy data.</li>
+</ul>
 <pre class="r"><code>distinct(NYC_transit_data_modified,station_name,line) %&gt;% 
   nrow()</code></pre>
 <pre><code>## [1] 465</code></pre>
@@ -160,13 +180,17 @@ NYC_transit_data_modified %&gt;%
   nrow()</code></pre>
 <pre><code>## [1] 84</code></pre>
 <pre class="r"><code># This is to get the anwser of how many stations are ADA complaint. Firstly, I removed the NA data of ADA notes.Then I use distinct function to found our how many distinct stations exist because some ADA compliants target the same station. It returns the 84 stations are ADA compliant. </code></pre>
-<p>There are 465 distinct stations</p>
-<p>There are 84 stations are ADA compliant.</p>
+<ul>
+<li><p>There are 465 distinct stations</p></li>
+<li><p>There are 84 stations are ADA compliant.</p></li>
+</ul>
 <pre class="r"><code>NYC_transit_data_modified %&gt;% 
 filter(vending == &quot;YES&quot;) %&gt;% 
   nrow()/nrow(NYC_transit_data_modified)</code></pre>
 <pre><code>## [1] 0.9020343</code></pre>
-<p>???What proportion of station entrances / exits without vending allow entrance? It returns 90.2% station entrances/exits without vending allow entrance.</p>
+<ul>
+<li>What proportion of station entrances / exits without vending allow entrance? It returns 90.2% station entrances/exits without vending allow entrance.</li>
+</ul>
 <pre class="r"><code>NYC_transit_data_modified %&gt;% 
   gather(., key = &quot;route_number&quot;, value = &quot;route_name&quot;, 5:15) %&gt;% 
   filter(., route_name == &quot;A&quot;) %&gt;% 
@@ -182,7 +206,56 @@ filter(vending == &quot;YES&quot;) %&gt;%
   nrow() </code></pre>
 <pre><code>## [1] 17</code></pre>
 <pre class="r"><code># Use filter function to firstly keep the row with A train and use filter function again to keep the row with ada complaints. It returns 17.</code></pre>
-<p>There are 56 distinct stations serve the A train.Of the stations that serve the A train, there are 17 have ADA complaint.</p>
+<ul>
+<li>There are 56 distinct stations serve the A train.Of the stations that serve the A train, there are 17 have ADA complaint.</li>
+</ul>
+</div>
+<div id="problem-2" class="section level1">
+<h1>Problem 2</h1>
+<pre class="r"><code>trashwheel_data = readxl::read_xlsx(&quot;./hw2_data/HealthyHarborWaterWheelTotals2017-9-26.xlsx&quot;, sheet = &quot;Mr.Trash_Wheel&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  select(-x_1) %&gt;% 
+  filter(!is.na(dumpster)) %&gt;% 
+  mutate(sports_balls = as.integer(round(sports_balls)))</code></pre>
+<pre class="r"><code>precipitation2016 = readxl::read_xlsx(&quot;./hw2_data/HealthyHarborWaterWheelTotals2017-9-26.xlsx&quot;, sheet = &quot;2016_Precipitation&quot;, range = &quot;A2:B14&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  filter(!is.na(total)) %&gt;% 
+  mutate(year = &quot;2016&quot;) %&gt;% 
+  select(year, everything())
+  
+precipitation2017 = readxl::read_xlsx(&quot;./hw2_data/HealthyHarborWaterWheelTotals2017-9-26.xlsx&quot;, sheet = &quot;2017_Precipitation&quot;, range = &quot;A2:B14&quot;)%&gt;% 
+  janitor::clean_names() %&gt;% 
+  filter(!is.na(total)) %&gt;% 
+  mutate(year = &quot;2017&quot;) %&gt;% 
+  select(year, everything()) 
+
+precipitation_tidy = bind_rows(precipitation2016, precipitation2017) %&gt;%   
+  mutate(month = month.name[month]) 
+precipitation_tidy</code></pre>
+<pre><code>## # A tibble: 20 x 3
+##    year  month     total
+##    &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt;
+##  1 2016  January    3.23
+##  2 2016  February   5.32
+##  3 2016  March      2.24
+##  4 2016  April      1.78
+##  5 2016  May        5.19
+##  6 2016  June       3.2 
+##  7 2016  July       6.09
+##  8 2016  August     3.96
+##  9 2016  September  4.53
+## 10 2016  October    0.62
+## 11 2016  November   1.47
+## 12 2016  December   2.32
+## 13 2017  January    2.34
+## 14 2017  February   1.46
+## 15 2017  March      3.57
+## 16 2017  April      3.99
+## 17 2017  May        5.64
+## 18 2017  June       1.4 
+## 19 2017  July       7.09
+## 20 2017  August     4.44</code></pre>
+<p>There are 12 observations in 2016 and 8 in 2017. Key Variable ???. The total precipitation in 2017 is 29.93 in. The median number of sports balls in a dumpster is 13</p>
 </div>
 
 

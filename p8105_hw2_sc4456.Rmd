@@ -16,8 +16,9 @@ NYC_transit_data_modified = read_csv("./hw2_data/NYC_Transit_Subway_Entrance_And
   janitor::clean_names() %>% 
   select(line, station_name, station_latitude, station_longitude, route1:route11, entry, vending, entrance_type, ada) %>% 
   mutate(entry = recode(entry, `YES`= "TRUE", `NO` = "FALSE" )) 
+NYC_transit_data_modified
 ```
-The new dataset contains viables of line, station name, station latitude, station longitue, 1 to 11 routs served, entry, vending, entrance type and ADA notes. For the data cleaning steps, I import the original dataset and modify the variable names and then use select function to retain the variables I interested. The new dataset gives the `r nrow (NYC_transit_data_modified)` rows and `r ncol(NYC_transit_data_modified)`. This is not tidy data.
+* The new dataset contains viables of line, station name, station latitude, station longitue, 1 to 11 routs served, entry, vending, entrance type and ADA notes. For the data cleaning steps, I import the original dataset and modify the variable names and then use select function to retain the variables I interested. The new dataset gives the `r nrow (NYC_transit_data_modified)` rows and `r ncol(NYC_transit_data_modified)`. This is not tidy data.
 ```{r}
 distinct(NYC_transit_data_modified,station_name,line) %>% 
   nrow()
@@ -29,16 +30,16 @@ NYC_transit_data_modified %>%
 # This is to get the anwser of how many stations are ADA complaint. Firstly, I removed the NA data of ADA notes.Then I use distinct function to found our how many distinct stations exist because some ADA compliants target the same station. It returns the 84 stations are ADA compliant. 
 ```
 
-There are `r nrow(distinct (NYC_transit_data_modified, line, station_name))` distinct stations
+* There are `r nrow(distinct (NYC_transit_data_modified, line, station_name))` distinct stations
 
-There are 84 stations are ADA compliant.
+* There are 84 stations are ADA compliant.
 
 ```{r}
 NYC_transit_data_modified %>% 
 filter(vending == "YES") %>% 
   nrow()/nrow(NYC_transit_data_modified)
 ```
-???What proportion of station entrances / exits without vending allow entrance? It returns 90.2% station entrances/exits without vending allow entrance. 
+* What proportion of station entrances / exits without vending allow entrance? It returns 90.2% station entrances/exits without vending allow entrance. 
 
 ```{r}
 NYC_transit_data_modified %>% 
@@ -58,6 +59,36 @@ NYC_transit_data_modified %>%
   nrow() 
 # Use filter function to firstly keep the row with A train and use filter function again to keep the row with ada complaints. It returns 17.
 ```
-There are 56 distinct stations serve the A train.Of the stations that serve the A train, there are 17 have ADA complaint.
+* There are 56 distinct stations serve the A train.Of the stations that serve the A train, there are 17 have ADA complaint.
+
+# Problem 2
+
+```{r}
+trashwheel_data = readxl::read_xlsx("./hw2_data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", sheet = "Mr.Trash_Wheel") %>% 
+  janitor::clean_names() %>% 
+  select(-x_1) %>% 
+  filter(!is.na(dumpster)) %>% 
+  mutate(sports_balls = as.integer(round(sports_balls)))
+
+```
+```{r}
+precipitation2016 = readxl::read_xlsx("./hw2_data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", sheet = "2016_Precipitation", range = "A2:B14") %>% 
+  janitor::clean_names() %>% 
+  filter(!is.na(total)) %>% 
+  mutate(year = "2016") %>% 
+  select(year, everything())
+  
+precipitation2017 = readxl::read_xlsx("./hw2_data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", sheet = "2017_Precipitation", range = "A2:B14")%>% 
+  janitor::clean_names() %>% 
+  filter(!is.na(total)) %>% 
+  mutate(year = "2017") %>% 
+  select(year, everything()) 
+
+precipitation_tidy = bind_rows(precipitation2016, precipitation2017) %>%   
+  mutate(month = month.name[month]) 
+precipitation_tidy
+
+```
+There are `r nrow(precipitation2016)` observations in 2016 and `r nrow(precipitation2017)` in 2017. Key Variable ???. The total precipitation in 2017 is `r sum(precipitation2017$total)` in. The median number of sports balls in a dumpster is `r median(trashwheel_data$sports_balls)`
 
 
