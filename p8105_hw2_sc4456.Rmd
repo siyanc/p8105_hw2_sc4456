@@ -91,4 +91,52 @@ precipitation_tidy
 ```
 There are `r nrow(precipitation2016)` observations in 2016 and `r nrow(precipitation2017)` in 2017. Key Variable ???. The total precipitation in 2017 is `r sum(precipitation2017$total)` in. The median number of sports balls in a dumpster is `r median(trashwheel_data$sports_balls)`
 
+# Problem 3
+```{r}
+devtools::install_github("p8105/p8105.datasets")
+library(p8105.datasets)
+data(brfss_smart2010)
+modified_brfss =
+brfss_smart2010 %>% 
+janitor::clean_names() %>% 
+filter(topic == "Overall Health") %>% 
+select(-class, -topic, -question, -sample_size, -confidence_limit_low : -geo_location) %>% 
+spread(response, data_value) %>% 
+janitor::clean_names() %>% 
+mutate(excellent_or_very_good = excellent + very_good) 
+```
+```{r}
+modified_brfss %>% 
+  distinct(locationdesc) %>% 
+  nrow()
+# It returns the 404 unique locations
+modified_brfss %>% 
+  distinct(locationabbr) %>% 
+  nrow()
+# It returns 51 states, so every state is representated
+names(which.max(table(modified_brfss$locationabbr)))
+# This method is what I found on google. I am trying to understand how it works. I guess it first help to fing the maximum occuring character and gives the name of the character. I guess the reason to use table function is that which.max function only works for table. It returns NJ.
+```
+
+* There are  and there are 51 distinct states, so every state is represented. `r names(which.max(table(modified_brfss$locationabbr)))` state is observed the most
+* The median of Excellent value is `r median(modified_brfss$excellent, na.rm = TRUE)`
+* Histogram 
+```{r}
+modified_brfss_2002 = filter(modified_brfss, year == "2002")
+# get the data of year of 2002
+ggplot(modified_brfss_2002, aes(x = excellent)) + geom_histogram()
+```
+* Scatterplot
+```{r}
+newyork_county_queens_county_data = filter(modified_brfss, locationdesc == "NY - Queens County" | locationdesc =="NY - New York County")
+# get the data of New York county and Queens county
+ggplot(newyork_county_queens_county_data, aes(x = year, y = excellent))+geom_point(aes(color = locationdesc))
+
+```
+
+
+
+
+
+
 
