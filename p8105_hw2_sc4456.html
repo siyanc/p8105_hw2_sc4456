@@ -133,7 +133,7 @@ $(document).ready(function () {
 <pre class="r"><code>NYC_transit_data_modified = read_csv(&quot;./hw2_data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv&quot;) %&gt;% 
   janitor::clean_names() %&gt;% 
   select(line, station_name, station_latitude, station_longitude, route1:route11, entry, vending, entrance_type, ada) %&gt;% 
-  mutate(entry = recode(entry, `YES`= &quot;TRUE&quot;, `NO` = &quot;FALSE&quot; ))</code></pre>
+  mutate(entry = recode(entry, `YES`= &quot;TRUE&quot;, `NO` = &quot;FALSE&quot; )) </code></pre>
 <pre><code>## Parsed with column specification:
 ## cols(
 ##   .default = col_character(),
@@ -184,47 +184,44 @@ NYC_transit_data_modified %&gt;%
 <li><p>There are 465 distinct stations</p></li>
 <li><p>There are 84 stations are ADA compliant.</p></li>
 </ul>
-<pre class="r"><code>NYC_novending_data = 
-NYC_transit_data_modified %&gt;% 
-  filter(vending == &quot;NO&quot;) 
-NYC_novending_but_allowentry = 
-  NYC_novending_data %&gt;% 
-filter(entry == &quot;TRUE&quot;)
-nrow(NYC_novending_but_allowentry) / nrow(NYC_novending_data)</code></pre>
-<pre><code>## [1] 0.3770492</code></pre>
+<pre class="r"><code>NYC_transit_data_modified %&gt;% 
+filter(vending == &quot;YES&quot;) %&gt;% 
+  nrow()/nrow(NYC_transit_data_modified)</code></pre>
+<pre><code>## [1] 0.9020343</code></pre>
 <ul>
-<li>What proportion of station entrances / exits without vending allow entrance? It returns 0.3770492 station entrances/exits without vending allow entrance.</li>
+<li>What proportion of station entrances / exits without vending allow entrance? It returns 90.2% station entrances/exits without vending allow entrance.</li>
 </ul>
-<pre class="r"><code>NYC_tidy_data =
-NYC_transit_data_modified %&gt;% 
-  gather(., key = &quot;route_number&quot;, value = &quot;route_name&quot;, 5:15)
-NYC_tidy_data</code></pre>
-<pre><code>## # A tibble: 20,548 x 10
-##    line  station_name station_latitude station_longitu… entry vending
-##    &lt;chr&gt; &lt;chr&gt;                   &lt;dbl&gt;            &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  
-##  1 4 Av… 25th St                  40.7            -74.0 TRUE  YES    
-##  2 4 Av… 25th St                  40.7            -74.0 TRUE  YES    
-##  3 4 Av… 36th St                  40.7            -74.0 TRUE  YES    
-##  4 4 Av… 36th St                  40.7            -74.0 TRUE  YES    
-##  5 4 Av… 36th St                  40.7            -74.0 TRUE  YES    
-##  6 4 Av… 45th St                  40.6            -74.0 TRUE  YES    
-##  7 4 Av… 45th St                  40.6            -74.0 TRUE  YES    
-##  8 4 Av… 45th St                  40.6            -74.0 TRUE  YES    
-##  9 4 Av… 45th St                  40.6            -74.0 TRUE  YES    
-## 10 4 Av… 53rd St                  40.6            -74.0 TRUE  YES    
-## # ... with 20,538 more rows, and 4 more variables: entrance_type &lt;chr&gt;,
-## #   ada &lt;lgl&gt;, route_number &lt;chr&gt;, route_name &lt;chr&gt;</code></pre>
-<pre class="r"><code>NYC_tidy_data %&gt;% 
-filter(., route_name == &quot;A&quot;) %&gt;% 
-distinct(., station_name, line) %&gt;% 
-nrow()</code></pre>
+<pre class="r"><code>NYC_transit_data_modified %&gt;% 
+  gather(., key = &quot;route_number&quot;, value = &quot;route_name&quot;, 5:15) %&gt;% 
+  filter(., route_name == &quot;A&quot;) %&gt;% 
+  distinct(., station_name, line) %&gt;% 
+  nrow() </code></pre>
 <pre><code>## [1] 60</code></pre>
+<pre class="r"><code>NYC_transit_data_modified</code></pre>
+<pre><code>## # A tibble: 1,868 x 19
+##    line  station_name station_latitude station_longitu… route1 route2
+##    &lt;chr&gt; &lt;chr&gt;                   &lt;dbl&gt;            &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; 
+##  1 4 Av… 25th St                  40.7            -74.0 R      &lt;NA&gt;  
+##  2 4 Av… 25th St                  40.7            -74.0 R      &lt;NA&gt;  
+##  3 4 Av… 36th St                  40.7            -74.0 N      R     
+##  4 4 Av… 36th St                  40.7            -74.0 N      R     
+##  5 4 Av… 36th St                  40.7            -74.0 N      R     
+##  6 4 Av… 45th St                  40.6            -74.0 R      &lt;NA&gt;  
+##  7 4 Av… 45th St                  40.6            -74.0 R      &lt;NA&gt;  
+##  8 4 Av… 45th St                  40.6            -74.0 R      &lt;NA&gt;  
+##  9 4 Av… 45th St                  40.6            -74.0 R      &lt;NA&gt;  
+## 10 4 Av… 53rd St                  40.6            -74.0 R      &lt;NA&gt;  
+## # ... with 1,858 more rows, and 13 more variables: route3 &lt;chr&gt;,
+## #   route4 &lt;chr&gt;, route5 &lt;chr&gt;, route6 &lt;chr&gt;, route7 &lt;chr&gt;, route8 &lt;int&gt;,
+## #   route9 &lt;int&gt;, route10 &lt;int&gt;, route11 &lt;int&gt;, entry &lt;chr&gt;,
+## #   vending &lt;chr&gt;, entrance_type &lt;chr&gt;, ada &lt;lgl&gt;</code></pre>
 <pre class="r"><code># I use gather function to reformat date from wide to long. To get the number of distinct stations serving A train, I filter the data to only keep the rows with A trains. Then I use previous method to get the number of distinct stations, which returns 60. </code></pre>
-<pre class="r"><code>NYC_tidy_data %&gt;% 
-filter(., route_name == &quot;A&quot;) %&gt;% 
-filter(ada == &quot;TRUE&quot;) %&gt;% 
-distinct(., station_name, line) %&gt;% 
-nrow() </code></pre>
+<pre class="r"><code>NYC_transit_data_modified %&gt;% 
+  gather(., key = &quot;route_number&quot;, value = &quot;route_name&quot;, 5:15) %&gt;% 
+  filter(., route_name == &quot;A&quot;) %&gt;% 
+  filter(ada == &quot;TRUE&quot;) %&gt;% 
+  distinct(., station_name, line) %&gt;% 
+  nrow() </code></pre>
 <pre><code>## [1] 17</code></pre>
 <pre class="r"><code># Use filter function to firstly keep the row with A train and use filter function again to keep the row with ada complaints. It returns 17.</code></pre>
 <ul>
@@ -233,18 +230,36 @@ nrow() </code></pre>
 </div>
 <div id="problem-2" class="section level1">
 <h1>Problem 2</h1>
-<pre class="r"><code>trashwheel_data = readxl::read_xlsx(&quot;./hw2_data/HealthyHarborWaterWheelTotals2017-9-26.xlsx&quot;, sheet = &quot;Mr.Trash_Wheel&quot;) %&gt;% 
+<pre class="r"><code>trashwheel_data = readxl::read_xlsx(&quot;./hw2_data/HealthyHarborWaterWheelTotals2018-7-28.xlsx&quot;, sheet = &quot;Mr. Trash Wheel&quot;) %&gt;% 
   janitor::clean_names() %&gt;% 
   select(-x_1) %&gt;% 
   filter(!is.na(dumpster)) %&gt;% 
-  mutate(sports_balls = as.integer(sports_balls)) </code></pre>
-<pre class="r"><code>precipitation2016 = readxl::read_xlsx(&quot;./hw2_data/HealthyHarborWaterWheelTotals2017-9-26.xlsx&quot;, sheet = &quot;2016_Precipitation&quot;, range = &quot;A2:B14&quot;) %&gt;% 
+  mutate(sports_balls = as.integer(round(sports_balls)))
+trashwheel_data</code></pre>
+<pre><code>## # A tibble: 285 x 14
+##    dumpster month  year date                weight_tons volume_cubic_ya…
+##       &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dttm&gt;                    &lt;dbl&gt;            &lt;dbl&gt;
+##  1        1 May    2014 2014-05-16 00:00:00        4.31               18
+##  2        2 May    2014 2014-05-16 00:00:00        2.74               13
+##  3        3 May    2014 2014-05-16 00:00:00        3.45               15
+##  4        4 May    2014 2014-05-17 00:00:00        3.1                15
+##  5        5 May    2014 2014-05-17 00:00:00        4.06               18
+##  6        6 May    2014 2014-05-20 00:00:00        2.71               13
+##  7        7 May    2014 2014-05-21 00:00:00        1.91                8
+##  8        8 May    2014 2014-05-28 00:00:00        3.7                16
+##  9        9 June   2014 2014-06-05 00:00:00        2.52               14
+## 10       10 June   2014 2014-06-11 00:00:00        3.76               18
+## # ... with 275 more rows, and 8 more variables: plastic_bottles &lt;dbl&gt;,
+## #   polystyrene &lt;dbl&gt;, cigarette_butts &lt;dbl&gt;, glass_bottles &lt;dbl&gt;,
+## #   grocery_bags &lt;dbl&gt;, chip_bags &lt;dbl&gt;, sports_balls &lt;int&gt;,
+## #   homes_powered &lt;dbl&gt;</code></pre>
+<pre class="r"><code>precipitation2016 = readxl::read_xlsx(&quot;./hw2_data/HealthyHarborWaterWheelTotals2018-7-28.xlsx&quot;, sheet = &quot;2016 Precipitation&quot;, range = &quot;A2:B14&quot;) %&gt;% 
   janitor::clean_names() %&gt;% 
   filter(!is.na(total)) %&gt;% 
   mutate(year = &quot;2016&quot;) %&gt;% 
   select(year, everything())
   
-precipitation2017 = readxl::read_xlsx(&quot;./hw2_data/HealthyHarborWaterWheelTotals2017-9-26.xlsx&quot;, sheet = &quot;2017_Precipitation&quot;, range = &quot;A2:B14&quot;)%&gt;% 
+precipitation2017 = readxl::read_xlsx(&quot;./hw2_data/HealthyHarborWaterWheelTotals2018-7-28.xlsx&quot;, sheet = &quot;2017 Precipitation&quot;, range = &quot;A2:B14&quot;)%&gt;% 
   janitor::clean_names() %&gt;% 
   filter(!is.na(total)) %&gt;% 
   mutate(year = &quot;2017&quot;) %&gt;% 
@@ -253,7 +268,7 @@ precipitation2017 = readxl::read_xlsx(&quot;./hw2_data/HealthyHarborWaterWheelTo
 precipitation_tidy = bind_rows(precipitation2016, precipitation2017) %&gt;%   
   mutate(month = month.name[month]) 
 precipitation_tidy</code></pre>
-<pre><code>## # A tibble: 20 x 3
+<pre><code>## # A tibble: 24 x 3
 ##    year  month     total
 ##    &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt;
 ##  1 2016  January    3.23
@@ -266,17 +281,8 @@ precipitation_tidy</code></pre>
 ##  8 2016  August     3.96
 ##  9 2016  September  4.53
 ## 10 2016  October    0.62
-## 11 2016  November   1.47
-## 12 2016  December   2.32
-## 13 2017  January    2.34
-## 14 2017  February   1.46
-## 15 2017  March      3.57
-## 16 2017  April      3.99
-## 17 2017  May        5.64
-## 18 2017  June       1.4 
-## 19 2017  July       7.09
-## 20 2017  August     4.44</code></pre>
-<p>There are 12 observations in 2016 and 8 in 2017. Key Variable ???. The total precipitation in 2017 is 29.93 in. The median number of sports balls in a dumpster is 13</p>
+## # ... with 14 more rows</code></pre>
+<p>There are 12 observations in 2016 and 12 observation in 2017. The Key Variable includs year, month and total precipitation. The total precipitation in 2017 is 32.93 in. The median number of sports balls in a dumpster is 8</p>
 </div>
 <div id="problem-3" class="section level1">
 <h1>Problem 3</h1>

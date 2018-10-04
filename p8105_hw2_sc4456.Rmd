@@ -15,7 +15,7 @@ library(tidyverse)
 NYC_transit_data_modified = read_csv("./hw2_data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>% 
   janitor::clean_names() %>% 
   select(line, station_name, station_latitude, station_longitude, route1:route11, entry, vending, entrance_type, ada) %>% 
-  mutate(entry = recode(entry, `YES`= "TRUE", `NO` = "FALSE" ))
+  mutate(entry = recode(entry, `YES`= "TRUE", `NO` = "FALSE" )) 
 NYC_transit_data_modified
 ```
 * The new dataset contains viables of line, station name, station latitude, station longitue, 1 to 11 routs served, entry, vending, entrance type and ADA notes. For the data cleaning steps, I import the original dataset and modify the variable names and then use select function to retain the variables I interested. The new dataset gives the `r nrow (NYC_transit_data_modified)` rows and `r ncol(NYC_transit_data_modified)`. This is not tidy data.
@@ -35,35 +35,29 @@ NYC_transit_data_modified %>%
 * There are 84 stations are ADA compliant.
 
 ```{r}
-NYC_novending_data = 
 NYC_transit_data_modified %>% 
-  filter(vending == "NO") 
-NYC_novending_but_allowentry = 
-  NYC_novending_data %>% 
-filter(entry == "TRUE")
-nrow(NYC_novending_but_allowentry) / nrow(NYC_novending_data)
+filter(vending == "YES") %>% 
+  nrow()/nrow(NYC_transit_data_modified)
 ```
-* What proportion of station entrances / exits without vending allow entrance? It returns `r nrow(NYC_novending_but_allowentry) / nrow(NYC_novending_data)` station entrances/exits without vending allow entrance. 
+* What proportion of station entrances / exits without vending allow entrance? It returns 90.2% station entrances/exits without vending allow entrance. 
 
 ```{r}
-NYC_tidy_data =
 NYC_transit_data_modified %>% 
-  gather(., key = "route_number", value = "route_name", 5:15)
-NYC_tidy_data
-
-NYC_tidy_data %>% 
-filter(., route_name == "A") %>% 
-distinct(., station_name, line) %>% 
-nrow()
+  gather(., key = "route_number", value = "route_name", 5:15) %>% 
+  filter(., route_name == "A") %>% 
+  distinct(., station_name, line) %>% 
+  nrow() 
+NYC_transit_data_modified
 # I use gather function to reformat date from wide to long. To get the number of distinct stations serving A train, I filter the data to only keep the rows with A trains. Then I use previous method to get the number of distinct stations, which returns 60. 
 ```
 
 ```{r}
-NYC_tidy_data %>% 
-filter(., route_name == "A") %>% 
-filter(ada == "TRUE") %>% 
-distinct(., station_name, line) %>% 
-nrow() 
+NYC_transit_data_modified %>% 
+  gather(., key = "route_number", value = "route_name", 5:15) %>% 
+  filter(., route_name == "A") %>% 
+  filter(ada == "TRUE") %>% 
+  distinct(., station_name, line) %>% 
+  nrow() 
 
 # Use filter function to firstly keep the row with A train and use filter function again to keep the row with ada complaints. It returns 17.
 ```
@@ -72,21 +66,21 @@ nrow()
 # Problem 2
 
 ```{r}
-trashwheel_data = readxl::read_xlsx("./hw2_data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", sheet = "Mr.Trash_Wheel") %>% 
+trashwheel_data = readxl::read_xlsx("./hw2_data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = "Mr. Trash Wheel") %>% 
   janitor::clean_names() %>% 
   select(-x_1) %>% 
   filter(!is.na(dumpster)) %>% 
-  mutate(sports_balls = as.integer(sports_balls)) 
-  
+  mutate(sports_balls = as.integer(round(sports_balls)))
+trashwheel_data
 ```
 ```{r}
-precipitation2016 = readxl::read_xlsx("./hw2_data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", sheet = "2016_Precipitation", range = "A2:B14") %>% 
+precipitation2016 = readxl::read_xlsx("./hw2_data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = "2016 Precipitation", range = "A2:B14") %>% 
   janitor::clean_names() %>% 
   filter(!is.na(total)) %>% 
   mutate(year = "2016") %>% 
   select(year, everything())
   
-precipitation2017 = readxl::read_xlsx("./hw2_data/HealthyHarborWaterWheelTotals2017-9-26.xlsx", sheet = "2017_Precipitation", range = "A2:B14")%>% 
+precipitation2017 = readxl::read_xlsx("./hw2_data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = "2017 Precipitation", range = "A2:B14")%>% 
   janitor::clean_names() %>% 
   filter(!is.na(total)) %>% 
   mutate(year = "2017") %>% 
@@ -97,7 +91,7 @@ precipitation_tidy = bind_rows(precipitation2016, precipitation2017) %>%
 precipitation_tidy
 
 ```
-There are `r nrow(precipitation2016)` observations in 2016 and `r nrow(precipitation2017)` in 2017. Key Variable ???. The total precipitation in 2017 is `r sum(precipitation2017$total)` in. The median number of sports balls in a dumpster is `r median(trashwheel_data$sports_balls)`
+There are `r nrow(precipitation2016)` observations in 2016 and `r nrow(precipitation2017)` observation in 2017. The Key Variable includs year, month and total precipitation. The total precipitation in 2017 is `r sum(precipitation2017$total)` in. The median number of sports balls in a dumpster is `r median(trashwheel_data$sports_balls)`
 
 # Problem 3
 ```{r}
