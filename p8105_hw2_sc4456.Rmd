@@ -2,7 +2,7 @@
 title: "p8105_hw2_sc4456"
 author: "Siyan Chen"
 date: "9/29/2018"
-output: html_document
+output: github_document
 editor_options: 
   chunk_output_type: console
 ---
