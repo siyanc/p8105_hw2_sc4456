@@ -113,6 +113,7 @@ select(-class, -topic, -question, -sample_size, -confidence_limit_low : -geo_loc
 spread(response, data_value) %>% 
 janitor::clean_names() %>% 
 mutate(excellent_or_very_good = excellent + very_good) 
+head(modified_brfss)
 ```
 ```{r}
 modified_brfss %>% 
