@@ -18,7 +18,7 @@ NYC_transit_data_modified = read_csv("./hw2_data/NYC_Transit_Subway_Entrance_And
   mutate(entry = recode(entry, `YES`= "TRUE", `NO` = "FALSE" )) 
 NYC_transit_data_modified
 ```
-* The new dataset contains viables of line, station name, station latitude, station longitue, 1 to 11 routs served, entry, vending, entrance type and ADA notes. For the data cleaning steps, I import the original dataset and modify the variable names and then use select function to retain the variables I interested. The new dataset gives the `r nrow (NYC_transit_data_modified)` rows and `r ncol(NYC_transit_data_modified)`. This is not tidy data.
+* The new dataset contains viables of line, station name, station latitude, station longitue, 1 to 11 routs served, entry, vending, entrance type and ADA notes. For the data cleaning steps, I import the original dataset and modify the variable names and then use select function to retain the variables I interested. The new dataset gives the `r nrow (NYC_transit_data_modified)` rows and `r ncol(NYC_transit_data_modified)` column. This is not tidy data because route number can be managed to be one variable. 
 ```{r}
 distinct(NYC_transit_data_modified,station_name,line) %>% 
   nrow()
@@ -36,10 +36,11 @@ NYC_transit_data_modified %>%
 
 ```{r}
 NYC_transit_data_modified %>% 
-filter(vending == "YES") %>% 
-  nrow()/nrow(NYC_transit_data_modified)
+filter(vending == "NO", entry == "TRUE") %>% 
+  nrow() / nrow(filter(NYC_transit_data_modified, vending == "NO"))
 ```
-* What proportion of station entrances / exits without vending allow entrance? It returns 90.2% station entrances/exits without vending allow entrance. 
+* What proportion of station entrances / exits without vending allow entrance?
+There are `r nrow(filter(NYC_transit_data_modified, vending == "NO", entry == "TRUE" ))`stations without vending but allow entry/ exist and `r nrow(filter(NYC_transit_data_modified, vending == "NO"))` stations without vending. The proportion is `r nrow(filter(NYC_transit_data_modified, vending == "NO", entry == "TRUE" )) / nrow(filter(NYC_transit_data_modified, vending == "NO"))`. It returns 37.7% station entrances/exits without vending allow entrance. 
 
 ```{r}
 NYC_transit_data_modified %>% 
@@ -61,7 +62,7 @@ NYC_transit_data_modified %>%
 
 # Use filter function to firstly keep the row with A train and use filter function again to keep the row with ada complaints. It returns 17.
 ```
-* There are 56 distinct stations serve the A train.Of the stations that serve the A train, there are 17 have ADA complaint.
+* There are 60 distinct stations serve the A train. Of the stations that serve the A train, there are 17 have ADA complaint.
 
 # Problem 2
 
@@ -74,7 +75,8 @@ trashwheel_data = readxl::read_xlsx("./hw2_data/HealthyHarborWaterWheelTotals201
 trashwheel_data
 ```
 ```{r}
-precipitation2016 = readxl::read_xlsx("./hw2_data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = "2016 Precipitation", range = "A2:B14") %>% 
+precipitation2016 = 
+  readxl::read_xlsx("./hw2_data/HealthyHarborWaterWheelTotals2018-7-28.xlsx", sheet = "2016 Precipitation", range = "A2:B14") %>% 
   janitor::clean_names() %>% 
   filter(!is.na(total)) %>% 
   mutate(year = "2016") %>% 
@@ -91,7 +93,12 @@ precipitation_tidy = bind_rows(precipitation2016, precipitation2017) %>%
 precipitation_tidy
 
 ```
-There are `r nrow(precipitation2016)` observations in 2016 and `r nrow(precipitation2017)` observation in 2017. The Key Variable includs year, month and total precipitation. The total precipitation in 2017 is `r sum(precipitation2017$total)` in. The median number of sports balls in a dumpster is `r median(trashwheel_data$sports_balls)`
+```{r}
+trashwheel_2016_data = trashwheel_data %>% 
+  filter(year == 2016)
+```
+
+There are `r nrow(trashwheel_data)` observation in Mr. Trash Wheel datasheet. The key variables include dumpster, date, weight_tons and others. For precipitation datasheet, there are `r nrow(precipitation2016)` observations in 2016 and `r nrow(precipitation2017)` observation in 2017. The Key Variable includs year, month and total precipitation. The total precipitation in 2017 is `r sum(precipitation2017$total)` in. The median number of sports balls in a dumpster in 2016 is `r median(trashwheel_2016_data $sports_balls)`
 
 # Problem 3
 ```{r}
